@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 
+#include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
 
@@ -42,6 +43,8 @@ public:
 	void loadShader(std::string fileName) {
 		std::ifstream file(fileName.c_str()); 
 		
+		if (!file)
+			throw std::runtime_error("can't open shader source");
 		// slow but... ehhh
 		std::string content((std::istreambuf_iterator<char>(file)),
                        (std::istreambuf_iterator<char>()));
@@ -52,7 +55,7 @@ public:
 		glCompileShader(shader);
 
 		if (hasErrors())
-			throw std::runtime_error("shader creation failed");; 
+			throw std::runtime_error("shader creation failed");
 	}
 
 	bool hasErrors() {
@@ -68,7 +71,8 @@ public:
 			std::unique_ptr<char[]> infoLog(new char[maxLength]);  
 			glGetShaderInfoLog(shader, (GLsizei)maxLength, NULL, infoLog.get());
 
-			ERROR_PRINT(std::string(infoLog.get()), 0, 0);
+			std::cout << "Shader log:" << std::endl;
+			std::cout << infoLog.get() << std::endl;
 
 			deleteShader();
 			return true; 

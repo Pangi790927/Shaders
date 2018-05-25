@@ -2,6 +2,7 @@
 #define SHADERPROGRAM_H_INCLUDED
 
 #include "Shader.h"
+#include "MathLib.h"
 #include <vector>
 #include <memory>
 
@@ -11,24 +12,31 @@ public:
 	GLuint program; 
 	std::vector<Shader> shaders;
 
+	struct ShaderIdent {
+		GLenum type;
+		std::string name;
+	};
+
 	ShaderProgram () {}
 	
-	ShaderProgram (std::initializer_list<std::pair<GLenum, std::string>> list) {
+	ShaderProgram (std::initializer_list<ShaderIdent> list) {
 		for (auto&& shaderPair : list) {
 			try {
-				addShader(shaderPair.first, shaderPair.second);
+				addShader(shaderPair.type, shaderPair.name);
 			}
 			catch (const std::exception& except) {
 				deleteProgram();
 				deleteShaders();
 
-				throw std::runtime_error(std::string() + "program shader creation failed because" \
-											   " shader failed  EXCEPTION: " + except.what());  
+				throw std::runtime_error(std::string() + 
+						"program shader creation failed because"
+						" shader failed  EXCEPTION: " + except.what());  
 			}
 		}
 
 		createProgram(); 
-		attachShaders(); 
+		attachShaders();
+		linkProgram();
 	}
 
  	void clear() {
@@ -81,7 +89,7 @@ public:
 			std::unique_ptr<char[]> infoLog(new char[maxLength]);  
 			glGetProgramInfoLog(program, maxLength, &maxLength, infoLog.get());
 			
-			ERROR_PRINT(std::string(infoLog.get()), 0, 0);
+			std::cout << infoLog.get() << std::endl;
 			
 			deleteProgram();
 			deleteShaders();
@@ -105,15 +113,15 @@ public:
 		}
 	}
 
-	void setMatrix (std::string uniformName, Matrix4f matrix) {
+	void setMatrix (std::string uniformName, Math::Mat4f matrix) {
 		useProgram();
 		glUniformMatrix4fv(glGetUniformLocation(program, uniformName.c_str())
-				, 1, GL_TRUE, matrix.returnFloatArray());
+				, 1, GL_TRUE, matrix.getPtr());
 	}
 
-	void setVector (std::string uniformName, Vector4f vec) {
+	void setVector (std::string uniformName, Math::Vec4f vec) {
 		useProgram();
-		glUniform4fv(glGetUniformLocation(program, uniformName.c_str()), 1, vec.array);
+		glUniform4fv(glGetUniformLocation(program, uniformName.c_str()), 1, vec.getPtr());
 	}
 
 	void setFloat (std::string uniformName, float value) {

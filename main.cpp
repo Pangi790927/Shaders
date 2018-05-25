@@ -1,9 +1,21 @@
 #include <iostream>
 #include "OpenglWindow.h"
+#include "ShaderProgram.h"
 
 int main (int argc, char const *argv[])
 {
 	OpenglWindow newWindow(500, 500, "Shaders Example");
+
+	ShaderProgram exampleProg = ShaderProgram({
+		{GL_VERTEX_SHADER, "Examples/defaultShader.vert"},
+		{GL_FRAGMENT_SHADER, "Examples/defaultShader.frag"}
+	});
+
+	exampleProg.setMatrix("projectionMatrix", Math::ident<4, float>());
+	exampleProg.setMatrix("viewMatrix", Math::ident<4, float>());
+	exampleProg.setMatrix("worldMatrix", Math::ident<4, float>());
+
+	exampleProg.setVector("uColor", Math::Vec4f(1, 1, 1, 1));
 
 	while (newWindow.active) {
 		if (newWindow.handleInput())

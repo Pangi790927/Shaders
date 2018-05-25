@@ -7,7 +7,11 @@ else
 	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -o test
 endif
 
-CXX_INCLUDE = -I ../Window
+CXX_INCLUDE = -I../Window -I../Math4f
 
-all:
+all: clean
 	$(CXX) -std=c++17 main.cpp $(CXX_FLAGS) $(CXX_INCLUDE)
+	./test
+
+clean:
+	rm -rf test
