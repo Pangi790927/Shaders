@@ -7,7 +7,7 @@ else
 	CXX_FLAGS = -lGLEW -lGLU -lGL -lX11 -o test
 endif
 
-CXX_INCLUDE = -I../Window -I../Math4f
+CXX_INCLUDE = -I../Window -I../Math4f -I../Shaders
 
 all: clean
 	$(CXX) -std=c++17 main.cpp $(CXX_FLAGS) $(CXX_INCLUDE)
